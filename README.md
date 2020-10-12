@@ -48,3 +48,20 @@
         }
 
 
+### - CRUD Operations using GraphQL Mutations :
+
+    -> IDE used for thsi example - https://graphql-sample.herokuapp.com/playground :
+
+    + Example - addPosts :
+
+    mutation { #1
+      addPost(title: "hello world", body: "learn how to learn"){ #2
+        body #3
+      }
+    }
+
+    #1 a CRUD operation is always started with the keyword mutation like the example above.
+    #2 arguments needed to create a new post.
+    #3 the attribute fetched to show if the record has been created successfuly.
+
+
