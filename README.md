@@ -1,4 +1,4 @@
-# Django GraphQL API
+# + Django GraphQL API
 
     + GraphQL IDE to execute queries :
     -> https://graphql.org/swapi-graphql/
@@ -24,6 +24,26 @@
             films{
               producers
             }
+          }
+        }
+
+
+### - Checking the type schema of data stored in the database (go to https://graphql.org/swapi-graphql/ and click on docs) :
+
+![](./static/schema_explorer.png)
+
+    + Query Starwar films using arguments :
+
+        *go to the schema explorer, you will get all objects with there methods and arguments and types of return :
+
+        - Example / to get a film by 'filmID' :
+
+        -> film(id: IDfilmID: ID): Film
+
+        {
+          film(filmID: "1") {
+            title
+            episodeID
           }
         }
 
