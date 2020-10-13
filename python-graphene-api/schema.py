@@ -11,7 +11,7 @@ class Query(graphene.ObjectType):
     def resolve_is_admin(self, info):
         return True
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query, auto_camelcase=False) # auto_camelcase when it's on False, so all queries should be written in snakecase (is_admin).
 
 result = schema.execute(
     '''
@@ -28,7 +28,7 @@ print(json.dumps(dictResult, indent=2))
 result = schema.execute(
     '''
     {
-        isAdmin
+        is_admin
     }
     '''
 )
