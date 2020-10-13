@@ -1,11 +1,12 @@
 import graphene
 import json
 from datetime import datetime
+import uuid
 
 class User(graphene.ObjectType):
-    id = graphene.ID()
+    id = graphene.ID(default_value=str(uuid.uuid4()))
     username = graphene.String()
-    created_at = graphene.DateTime() # createdAt in CamelCase
+    created_at = graphene.DateTime(default_value=datetime.now()) # createdAt in CamelCase
 
 class Query(graphene.ObjectType):
     users = graphene.List(User, limit=graphene.Int())
@@ -20,9 +21,9 @@ class Query(graphene.ObjectType):
 
     def resolve_users(self, info, limit=None): # make it optional
         return [
-            User(id="1", username="Fred", created_at=datetime.now()),
-            User(id="2", username="MDR", created_at=datetime.now()),
-            User(id="3", username="AMINE", created_at=datetime.now())
+            User(id="1", username="Fred"),
+            User(id="2", username="MDR"),
+            User(id="3", username="AMINE")
         ][:limit]
 
 class CreateUser(graphene.Mutation):
@@ -32,7 +33,7 @@ class CreateUser(graphene.Mutation):
         username = graphene.String()
 
     def mutate(self, info, username):
-        user = User(id="3", username=username, created_at=datetime.now())
+        user = User(username=username)
         return CreateUser(user=user)
 
 class Mutation(graphene.ObjectType):
@@ -94,8 +95,8 @@ print(json.dumps(dictResult, indent=2))
 
 result = schema.execute(
     '''
-        mutation {
-            createUser(username: "Jeff") {
+        mutation($username: String) {
+            createUser(username: $username) {
                 user {
                     id
                     username
@@ -104,9 +105,31 @@ result = schema.execute(
             }
 
         }
-    '''
+    ''',
+    variable_values={'username': 'David'}
 )
 
 dictResult = dict(result.data.items())
 
 print(json.dumps(dictResult, indent=2))
+
+# Query User with arguments
+
+result = schema.execute(
+    '''
+       query getUsersQuery ($limit: Int!) {
+            users(limit: $limit) {
+                id
+                username
+                createdAt
+            }
+       }
+    ''',
+    variable_values={'limit': 2}
+)
+
+dictResult = dict(result.data.items())
+
+print(json.dumps(dictResult, indent=2))
+
+# query getUsersQuery ($limit: Int!) -> exclamation mark on the type means that the argument is mandatory.
