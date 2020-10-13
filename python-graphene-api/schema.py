@@ -8,6 +8,10 @@ class User(graphene.ObjectType):
     username = graphene.String()
     created_at = graphene.DateTime(default_value=datetime.now()) # createdAt in CamelCase
 
+class Post(graphene.ObjectType):
+    title = graphene.String()
+    content = graphene.String()
+
 class Query(graphene.ObjectType):
     users = graphene.List(User, limit=graphene.Int())
     hello = graphene.String()
@@ -36,8 +40,23 @@ class CreateUser(graphene.Mutation):
         user = User(username=username)
         return CreateUser(user=user)
 
+class CreatePost(graphene.Mutation):
+    post = graphene.Field(Post)
+
+    class Arguments:
+        title = graphene.String()
+        content = graphene.String()
+
+    def mutate(self, info, title, content):
+        if info.context.get('is_anonymous'):
+            raise Exception('You''re not authenticated')
+
+        post = Post(title=title, content=content)
+        return CreatePost(post=post)
+
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    create_post = CreatePost.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation) # we can use (query=Query, mutation=Mutation, auto_camelcase=False) # auto_camelcase when it's on False, so all queries should be written in snakecase (is_admin).
 
@@ -133,3 +152,28 @@ dictResult = dict(result.data.items())
 print(json.dumps(dictResult, indent=2))
 
 # query getUsersQuery ($limit: Int!) -> exclamation mark on the type means that the argument is mandatory.
+
+# Create new post
+
+result = schema.execute(
+    '''
+       mutation($title: String!, $content: String!) {
+            createPost(title: $title, content: $content) {
+                post {
+                    title
+                    content
+                }
+            }
+       }
+    ''',
+    context = {'is_anonymous': False},
+    variable_values={'title': 'hello world', 'content': 'how to code your first hello world.'}
+)
+
+dictResult = dict(result.data.items())
+
+print(json.dumps(dictResult, indent=2))
+
+# query getUsersQuery ($limit: Int!) -> exclamation mark on the type means that the argument is mandatory.
+
+# context variables could be accessed by info argumenst. -> info.context.get('is_anonymous')
