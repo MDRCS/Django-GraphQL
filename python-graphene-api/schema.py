@@ -8,7 +8,7 @@ class User(graphene.ObjectType):
     created_at = graphene.DateTime() # createdAt in CamelCase
 
 class Query(graphene.ObjectType):
-    users = graphene.List(User)
+    users = graphene.List(User, limit=graphene.Int())
     hello = graphene.String()
     is_admin = graphene.Boolean()
 
@@ -18,12 +18,12 @@ class Query(graphene.ObjectType):
     def resolve_is_admin(self, info):
         return True
 
-    def resolve_users(self, info):
+    def resolve_users(self, info, limit=None): # make it optional
         return [
             User(id="1", username="Fred", created_at=datetime.now()),
             User(id="2", username="MDR", created_at=datetime.now()),
             User(id="3", username="AMINE", created_at=datetime.now())
-        ]
+        ][:limit]
 
 schema = graphene.Schema(query=Query) # we can use (query=Query, auto_camelcase=False) # auto_camelcase when it's on False, so all queries should be written in snakecase (is_admin).
 
@@ -58,7 +58,7 @@ print(json.dumps(dictResult, indent=2))
 result = schema.execute(
     '''
     {
-        users {
+        users(limit: 2) {
           id
           username
           createdAt
