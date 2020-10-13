@@ -25,7 +25,22 @@ class Query(graphene.ObjectType):
             User(id="3", username="AMINE", created_at=datetime.now())
         ][:limit]
 
-schema = graphene.Schema(query=Query) # we can use (query=Query, auto_camelcase=False) # auto_camelcase when it's on False, so all queries should be written in snakecase (is_admin).
+class CreateUser(graphene.Mutation):
+    user = graphene.Field(User)
+
+    class Arguments:
+        username = graphene.String()
+
+    def mutate(self, info, username):
+        user = User(id="3", username=username, created_at=datetime.now())
+        return CreateUser(user=user)
+
+class Mutation(graphene.ObjectType):
+    create_user = CreateUser.Field()
+
+schema = graphene.Schema(query=Query, mutation=Mutation) # we can use (query=Query, mutation=Mutation, auto_camelcase=False) # auto_camelcase when it's on False, so all queries should be written in snakecase (is_admin).
+
+# Hello field query
 
 result = schema.execute(
     '''
@@ -38,6 +53,8 @@ result = schema.execute(
 dictResult = dict(result.data.items())
 
 print(json.dumps(dictResult, indent=2))
+
+# isAdmin field query
 
 result = schema.execute(
     '''
@@ -55,6 +72,8 @@ dictResult = dict(result.data.items())
 
 print(json.dumps(dictResult, indent=2))
 
+# User field query with arguments
+
 result = schema.execute(
     '''
     {
@@ -64,6 +83,27 @@ result = schema.execute(
           createdAt
         }
     }
+    '''
+)
+
+dictResult = dict(result.data.items())
+
+print(json.dumps(dictResult, indent=2))
+
+# User field creation.
+
+result = schema.execute(
+    '''
+        mutation {
+            createUser(username: "Jeff") {
+                user {
+                    id
+                    username
+                    createdAt
+                }
+            }
+
+        }
     '''
 )
 
