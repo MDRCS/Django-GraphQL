@@ -64,4 +64,23 @@
     #2 arguments needed to create a new post.
     #3 the attribute fetched to show if the record has been created successfuly.
 
+    + Use variables in mutations queries :
 
+    mutation($title: String!, $body: String!) {
+      addPost(title: $title, body: $body){
+        body
+      }
+    }
+
+    # {
+        "title": "hello world",
+        "body": "learn how to learn"
+      }
+
+
+### - Create a small backend using django and graphene :
+
+    $ pip3 install pipenv
+    $ pipenv shell
+    $ pipenv install graphene
+    $ exit
