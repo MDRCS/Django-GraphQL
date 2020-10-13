@@ -84,3 +84,9 @@
     $ pipenv shell
     $ pipenv install graphene
     $ exit
+
+    # snake case vs Camel Case
+    # if we enter is_admin attribute in the schema to see if admin or not we will have an error,
+    # instead we should change is_admin to isAdmin (CamelCase) without that, it won't work.
+
+    # check schema.py for more info.
